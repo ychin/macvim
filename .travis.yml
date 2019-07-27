@@ -71,13 +71,13 @@ before_deploy:
 deploy:
   provider: releases
   api_key:
-    secure: ukjm+qbuNiTli25Ut2BoVpeBCV+JyVbRUwPqjTKrJxfHz34bpr38eSbryIB8BgKBItgzE876Yoqa3CD0k8mqGClis1+98MtrYFpAkO97juJmHpcZZZB7ausbHGf7Z7VdMT4jBjjVGcBeaNj0mio0hwem0/S4WyJK3M/3Fym995CltCUtJKRfMvRiGkWZqUs8K7EZf53DFR6CXUn38rq/3B88SeK51OZuCkMsiDWLGYCdayH19vJfFrTF8MYMQYDYxz16Q/Kf21PVhwia7HEhOzqnXS8RXS+vLkZw8mzIxowX+w6NT90q7Sj0ENdR7YaS27QPfDdhZEnOgpgqj+za63lpiyIdRcgSBkGxNYrM6B5KhiwC1VocBxCBdCxT5WXlx9rA9+k4CASdsxAW/MtQOK6PRMfZEnAB+ShFvshM2H/iE5Jch+o/SIjCXhdkeASD5qov2x6eXcsEVu8PIxvEUptCpHeqJTN5/26nfKsvOdrsqbwJbDluwISOKfEPhohb8Hn7JqOJNTS2aJr3jfvU+egE1NS0eLqKPXecu7MOOsOq1CQL6WxblphG2JCCmAOuNMYrJx9+w28ekMDRDAbI9r5nWcPLZtBqjFUyuBXXM7UknMar0FZ2fd7YTi/Gki3n56UN0lKaSAKaJB9EXlneDSKp/1ogsETr9/b7jz0s6lI=
+    secure: WkeAZi2sgn48BVbdoZTciZmnWakBE7gA5DUkik4IAhQht/e8e0uf5y9YHz/b5yUTkdIkXhhn+mtStbC42e2s+/ma81n0bvohWWFVE41M/SlAYwT2r77hDnU77905sVvIZqQJ8x0laFnSCDiZLbtJkIhEeoVg9nd6C+e9h4A83j+izMb5ZUV5kSoWEnkoc3Civvxn9M1/+YcNOWzMvh8HoXfTLHKYPTN/T3X1wQIQ+d1tPbMuqJefUH7T68lgJxERq5EaKygqYkGMUf5LSyiU9qe9WxYrNC51BhCrvMr1OoqKNuvhW6aMqFgbjmkpux4rVXFN+N9zBOXWkAMX5gBziKhAZIW5nIHcw4X+863Nmg9+YnUoUapkg0OW0UbQTitw2Y1//jidSvIMM5b4+vaAbWtRVXZSBKnfsOwTuVIR3q67i898OPib78A1GtcrUwDoTZryf4IAXnjpypTLgMUYBW2Ee0X5V2FHjfSzRVb1EXDoiwZklFRFUyXcBtQvh6P+RgKiENFuBYBTZUyEN9uDgJ/O/k1fLFVIGIcxUMxM1OsslhM6qrbyaWi8NBMXcmFNR2LhdTCjpy8Ux0SaeQOCFO1aqvybRAFC+Ey51EqqdpDFrwUeFPTG0tPvhPaadn8d0ot3y1rT9fW0L9qQ36WvMLlVxmVdk7Zgqf4Oek9iWi8=
   file: src/MacVim/build/Release/MacVim.dmg
   skip_cleanup: true
   on:
     condition: $TRAVIS_OSX_IMAGE = xcode10.2
     all_branches: true
     tags: true
-    repo: macvim-dev/macvim
+    repo: ychin/macvim
 
 # vim:set sts=2 sw=2 tw=0 et:
