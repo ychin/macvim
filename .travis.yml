@@ -58,11 +58,12 @@ script:
   - echo -en "travis_fold:end:test\\r"
 
 before_deploy:
+  - make -C src macvim-dmg
 deploy:
   provider: releases
   api_key:
     secure: WkeAZi2sgn48BVbdoZTciZmnWakBE7gA5DUkik4IAhQht/e8e0uf5y9YHz/b5yUTkdIkXhhn+mtStbC42e2s+/ma81n0bvohWWFVE41M/SlAYwT2r77hDnU77905sVvIZqQJ8x0laFnSCDiZLbtJkIhEeoVg9nd6C+e9h4A83j+izMb5ZUV5kSoWEnkoc3Civvxn9M1/+YcNOWzMvh8HoXfTLHKYPTN/T3X1wQIQ+d1tPbMuqJefUH7T68lgJxERq5EaKygqYkGMUf5LSyiU9qe9WxYrNC51BhCrvMr1OoqKNuvhW6aMqFgbjmkpux4rVXFN+N9zBOXWkAMX5gBziKhAZIW5nIHcw4X+863Nmg9+YnUoUapkg0OW0UbQTitw2Y1//jidSvIMM5b4+vaAbWtRVXZSBKnfsOwTuVIR3q67i898OPib78A1GtcrUwDoTZryf4IAXnjpypTLgMUYBW2Ee0X5V2FHjfSzRVb1EXDoiwZklFRFUyXcBtQvh6P+RgKiENFuBYBTZUyEN9uDgJ/O/k1fLFVIGIcxUMxM1OsslhM6qrbyaWi8NBMXcmFNR2LhdTCjpy8Ux0SaeQOCFO1aqvybRAFC+Ey51EqqdpDFrwUeFPTG0tPvhPaadn8d0ot3y1rT9fW0L9qQ36WvMLlVxmVdk7Zgqf4Oek9iWi8=
-  file: src/MacVim/build/Release/MacVim.app
+  file: src/MacVim/build/Release/MacVim.dmg
   skip_cleanup: true
   draft: true
   on:
