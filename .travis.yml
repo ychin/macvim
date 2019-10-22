@@ -16,7 +16,6 @@ addons:
     - lua
     - ruby
     - python3
-    update: true
 
 env:
   - MACOSX_DEPLOYMENT_TARGET=10.8
@@ -56,12 +55,7 @@ script:
   - rm -f result; $VIMCMD -g -f -c "redir>result" -c "py3 import sys; print(\"Test\")" -c "redir END" -c q; cat result; echo; grep -q -w Test result
   - rm -f result; $VIMCMD -g -f -c "redir>result" -c "ruby puts(\"Test\")" -c "redir END" -c q; cat result; echo; grep -q -w Test result
   - rm -f result;
-  - make test
   - echo -en "travis_fold:end:test\\r"
-  - echo "Testing MacVim (GUI)" && echo -en "travis_fold:start:test_gui\\r"
-  - make -C src/testdir clean
-  - make -C src testgui
-  - echo -en "travis_fold:end:test_gui\\r"
 
 before_deploy:
   - make -C src macvim-dmg
