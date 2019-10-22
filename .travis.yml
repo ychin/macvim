@@ -13,9 +13,6 @@ compiler:
 addons:
   homebrew:
     packages:
-    - lua
-    - ruby
-    - python3
 
 env:
   - MACOSX_DEPLOYMENT_TARGET=10.8
@@ -41,19 +38,11 @@ script:
   - ./configure $CONFOPT --enable-fail-if-missing
   - cat src/auto/config.mk
   - cat src/auto/config.h
-  - grep -q -- "-DDYNAMIC_PERL_DLL=\\\\\"$vi_cv_dll_name_perl\\\\\"" src/auto/config.mk
-  - grep -q -- "-DDYNAMIC_PYTHON_DLL=\\\\\"$vi_cv_dll_name_python\\\\\"" src/auto/config.mk
-  - grep -q -- "-DDYNAMIC_PYTHON3_DLL=\\\\\"$vi_cv_dll_name_python3\\\\\"" src/auto/config.mk
   - echo -en "travis_fold:end:config\\r"
   - echo "Building MacVim" && echo -en "travis_fold:start:build\\r"
   - make -j$NPROC
   - echo -en "travis_fold:end:build\\r"
   - echo "Testing MacVim" && echo -en "travis_fold:start:test\\r"
-  - rm -f result; $VIMCMD -g -f -c "redir>result" -c "lua print(\"Test\")" -c "redir END" -c q; cat result; echo; grep -q -w Test result
-  - rm -f result; $VIMCMD -g -f -c "redir>result" -c "perl VIM::Msg(\"Test\")" -c "redir END" -c q; cat result; echo; grep -q -w Test result
-  - rm -f result; $VIMCMD -g -f -c "redir>result" -c "py import sys; print(\"Test\")" -c "redir END" -c q; cat result; echo; grep -q -w Test result
-  - rm -f result; $VIMCMD -g -f -c "redir>result" -c "py3 import sys; print(\"Test\")" -c "redir END" -c q; cat result; echo; grep -q -w Test result
-  - rm -f result; $VIMCMD -g -f -c "redir>result" -c "ruby puts(\"Test\")" -c "redir END" -c q; cat result; echo; grep -q -w Test result
   - rm -f result;
   - echo -en "travis_fold:end:test\\r"
 
