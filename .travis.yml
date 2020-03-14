@@ -18,9 +18,11 @@ env:
       vi_cv_dll_name_python3=/usr/local/Frameworks/Python.framework/Versions/3.7/Python
       vi_cv_dll_name_ruby=/usr/local/opt/ruby/lib/libruby.dylib
       VIMCMD=src/MacVim/build/Release/MacVim.app/Contents/MacOS/Vim
-      "CONFOPT='--with-features=huge --enable-multibyte --enable-terminal --enable-netbeans --with-tlib=ncurses --enable-cscope --enable-gui=macvim'"
+      "CONFOPT='--with-features=huge --enable-netbeans --with-tlib=ncurses --enable-cscope --enable-gui=macvim'"
 
-anchors:
+_anchors:
+  - &lang_env
+    env: "LANGOPT='--enable-perlinterp=dynamic --enable-pythoninterp=dynamic --enable-python3interp=dynamic --enable-rubyinterp=dynamic --enable-luainterp=dynamic --with-lua-prefix=/usr/local'"
   - &homebrew
     addons:
       homebrew:
@@ -29,21 +31,12 @@ anchors:
           - python
           - ruby
         update: true
-    before_install:
-      # Homebrew has issues linking Python due to conflicts with Python2. Manually link in Python3.
-      - brew link --overwrite python3
-  - &lang_env
-    env: "LANGOPT='--enable-perlinterp=dynamic --enable-pythoninterp=dynamic --enable-python3interp=dynamic --enable-rubyinterp=dynamic --enable-luainterp=dynamic --with-lua-prefix=/usr/local'"
   - &caches
     cache:
       directories:
         - /usr/local/Homebrew/Library/Homebrew/vendor/
-        - /usr/local/Homebrew/Library/Taps/
+        - /usr/local/Homebrew/Library/Taps/homebrew/homebrew-core/
         - ${TRAVIS_BUILD_DIR}/src/MacVim/build/Release/MacVim.app/
-    before_cache:
-      - brew cleanup
-
-sudo: false
 
 script:
   - set -o errexit
@@ -89,7 +82,7 @@ script:
 
 jobs:
   include:
-    - osx_image: xcode11.2
+    - osx_image: xcode11.3
       <<: *lang_env
       <<: *homebrew
       <<: *caches
@@ -97,7 +90,7 @@ jobs:
     - osx_image: xcode9.4
     - osx_image: xcode7.3
     - stage: deploy
-      osx_image: xcode11.2
+      osx_image: xcode11.3
       <<: *lang_env
       <<: *caches
       script: skip
@@ -105,10 +98,9 @@ jobs:
         - make -C src macvim-dmg
       deploy:
         provider: releases
-        api_key:
+        token:
           secure: WkeAZi2sgn48BVbdoZTciZmnWakBE7gA5DUkik4IAhQht/e8e0uf5y9YHz/b5yUTkdIkXhhn+mtStbC42e2s+/ma81n0bvohWWFVE41M/SlAYwT2r77hDnU77905sVvIZqQJ8x0laFnSCDiZLbtJkIhEeoVg9nd6C+e9h4A83j+izMb5ZUV5kSoWEnkoc3Civvxn9M1/+YcNOWzMvh8HoXfTLHKYPTN/T3X1wQIQ+d1tPbMuqJefUH7T68lgJxERq5EaKygqYkGMUf5LSyiU9qe9WxYrNC51BhCrvMr1OoqKNuvhW6aMqFgbjmkpux4rVXFN+N9zBOXWkAMX5gBziKhAZIW5nIHcw4X+863Nmg9+YnUoUapkg0OW0UbQTitw2Y1//jidSvIMM5b4+vaAbWtRVXZSBKnfsOwTuVIR3q67i898OPib78A1GtcrUwDoTZryf4IAXnjpypTLgMUYBW2Ee0X5V2FHjfSzRVb1EXDoiwZklFRFUyXcBtQvh6P+RgKiENFuBYBTZUyEN9uDgJ/O/k1fLFVIGIcxUMxM1OsslhM6qrbyaWi8NBMXcmFNR2LhdTCjpy8Ux0SaeQOCFO1aqvybRAFC+Ey51EqqdpDFrwUeFPTG0tPvhPaadn8d0ot3y1rT9fW0L9qQ36WvMLlVxmVdk7Zgqf4Oek9iWi8=
         file: src/MacVim/build/Release/MacVim.dmg
-        skip_cleanup: true
         draft: true
         on:
           all_branches: true
