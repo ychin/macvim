@@ -72,12 +72,12 @@ script:
   - macvim_excmd -c 'py import sys; print("Test")'
   - macvim_excmd -c 'py3 import sys; print("Test")'
   - macvim_excmd -c 'ruby puts("Test")'
-  - make test
+ # - make test
   - make -C runtime/doc vimtags VIMEXE=../../src/MacVim/build/Release/MacVim.app/Contents/bin/vim
   - echo -en "travis_fold:end:test\\r\\033[0K"
   - echo -e "\\033[33;1mTesting MacVim (GUI)\\033[0m" && echo -en "travis_fold:start:test_gui\\r\\033[0K"
-  - make -C src/testdir clean
-  - make -C src testgui
+  #- make -C src/testdir clean
+  #- make -C src testgui
   - echo -en "travis_fold:end:test_gui\\r\\033[0K"
 
 jobs:
@@ -86,9 +86,6 @@ jobs:
       <<: *lang_env
       <<: *homebrew
       <<: *caches
-    - osx_image: xcode10.3
-    - osx_image: xcode9.4
-    - osx_image: xcode7.3
     - stage: deploy
       osx_image: xcode11.3
       <<: *lang_env
