@@ -1,4 +1,17 @@
 <style>
 :root { supported-color-schemes: light dark; color-scheme: light dark; }
-h1 { padding-bottom: .3em; border-bottom: 1px solid gray; }
+div > h1 { padding-bottom: .3em; border-bottom: 1px solid gray; }
+
+div > header {
+  font-size: 110%;
+  color: #599A42;
+  border-bottom: 3px solid #57c4d0;
+}
+@media (prefers-color-scheme: dark) {
+  div > header {
+    color: rgb(48,209,88);
+  }
+}
+div.sparkle-installed-version { display:none; }
+div.sparkle-installed-version ~ div { display: none; }
 </style>
