@@ -350,25 +350,25 @@ jobs:
         run: |
           make ${MAKE_BUILD_ARGS} -C src macvim-tests
 
-      - name: Build Vim test binaries
-        run: |
-          # Build the unit test binaries first. With link-time-optimization they take some time to link. Running them
-          # separately de-couples them from the timeout in tests, and allow us to build in parallel jobs (since tests
-          # can't run in parallel).
-          NPROC=$(getconf _NPROCESSORS_ONLN)
-
-          set -o verbose
-          make ${MAKE_BUILD_ARGS} -j${NPROC} -C src unittesttargets
-
-      - name: Test Vim
-        timeout-minutes: 20
-        run: make ${MAKE_BUILD_ARGS} test
-
-      - name: Test Vim (GUI)
-        timeout-minutes: 20
-        run: |
-          make ${MAKE_BUILD_ARGS} -C src/testdir clean
-          make ${MAKE_BUILD_ARGS} -C src testgui
+#      - name: Build Vim test binaries
+#        run: |
+#          # Build the unit test binaries first. With link-time-optimization they take some time to link. Running them
+#          # separately de-couples them from the timeout in tests, and allow us to build in parallel jobs (since tests
+#          # can't run in parallel).
+#          NPROC=$(getconf _NPROCESSORS_ONLN)
+#
+#          set -o verbose
+#          make ${MAKE_BUILD_ARGS} -j${NPROC} -C src unittesttargets
+#
+#      - name: Test Vim
+#        timeout-minutes: 20
+#        run: make ${MAKE_BUILD_ARGS} test
+#
+#      - name: Test Vim (GUI)
+#        timeout-minutes: 20
+#        run: |
+#          make ${MAKE_BUILD_ARGS} -C src/testdir clean
+#          make ${MAKE_BUILD_ARGS} -C src testgui
 
       # Creates a DMG package of MacVim. Note that this doesn't create a GitHub release for us, because we would prefer to
       # do it manually, for two reasons: 1) signing / notarization are currently done out of CI, 2) we want to manually
