@@ -80,12 +80,12 @@ jobs:
 
           # Most up to date OS and Xcode. Used to publish release for the main build.
           - os: macos-15
-            xcode: '16.0'
+            xcode: '16.1'
             publish: false
             optimized: false
 
           - os: macos-15
-            xcode: '16.0'
+            xcode: '16.1'
             publish: true
             optimized: true
 
