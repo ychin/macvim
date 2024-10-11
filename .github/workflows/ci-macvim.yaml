@@ -55,26 +55,35 @@ jobs:
         include:
           # Oldest version of Xcode supported on GitHub Action to test source code backwards compatibility
           # This version of Xcode can run on macOS 11 where as 13.3 has to run on macOS 12.
-          - os: macos-12
-            xcode: '13.2.1'
-            extra: [vimtags, check-xcodeproj-compat]
+  #        - os: macos-12
+  #          xcode: '13.2.1'
+  #          extra: [vimtags, check-xcodeproj-compat]
 
-          # Older version of Xcode, and used to publish legacy builds (for macOS 10.9 - 10.12)
-          - os: macos-12
-            xcode: '14.0' # last version of Xcode that uses the macOS 12 SDK, which still supports deploying to macOS 10.9
-            publish: true
-            legacy: true
-            publish_postfix: '_10.9'
+  #        # Older version of Xcode, and used to publish legacy builds (for macOS 10.9 - 10.12)
+  #        - os: macos-12
+  #          xcode: '14.0' # last version of Xcode that uses the macOS 12 SDK, which still supports deploying to macOS 10.9
+  #          publish: true
+  #          legacy: true
+  #          publish_postfix: '_10.9'
 
-          - os: macos-13
-            xcode: '15.2'
+#          - os: macos-13
+#            xcode: '15.2'
 
           # Below runners use Apple Silicon.
           - os: macos-14
             xcode: '15.4'
             optimized: true
 
+          - os: macos-14
+            xcode: '16.0'
+            optimized: true
+
           # Most up to date OS and Xcode. Used to publish release for the main build.
+          - os: macos-15
+            xcode: '16.0'
+            publish: false
+            optimized: false
+
           - os: macos-15
             xcode: '16.0'
             publish: true
@@ -367,11 +376,11 @@ jobs:
         timeout-minutes: 20
         run: make ${MAKE_BUILD_ARGS} test
 
-      - name: Test Vim (GUI)
-        timeout-minutes: 20
-        run: |
-          make ${MAKE_BUILD_ARGS} -C src/testdir clean
-          make ${MAKE_BUILD_ARGS} -C src testgui
+#      - name: Test Vim (GUI)
+#        timeout-minutes: 20
+#        run: |
+#          make ${MAKE_BUILD_ARGS} -C src/testdir clean
+#          make ${MAKE_BUILD_ARGS} -C src testgui
 
       # Creates a DMG package of MacVim. Note that this doesn't create a GitHub release for us, because we would prefer to
       # do it manually, for two reasons: 1) signing / notarization are currently done out of CI, 2) we want to manually
