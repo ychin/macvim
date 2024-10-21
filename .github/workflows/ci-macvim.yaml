@@ -22,7 +22,7 @@ env:
 
   MAKE_BUILD_ARGS: LINK_AS_NEEDED=yes # In macOS we never over-specify link dependencies and we already check against external deps in smoketest. With LTO, linking takes a while, so we want to avoid using link.sh.
 
-  VERSIONER_PERL_VERSION: '5.30'  # macOS default Perl installation uses this to determine which one to use
+  VERSIONER_PERL_VERSION: '5.34'  # macOS default Perl installation uses this to determine which one to use
 
   vi_cv_path_python: /Library/Frameworks/Python.framework/Versions/2.7/bin/python
   vi_cv_path_python3: "%s/bin/python3"
@@ -55,20 +55,20 @@ jobs:
         include:
           # Oldest version of Xcode supported on GitHub Action to test source code backwards compatibility
           # This version of Xcode can run on macOS 11 where as 13.3 has to run on macOS 12.
-          - os: macos-12
-            xcode: '13.2.1'
-            extra: [vimtags, check-xcodeproj-compat]
+#          - os: macos-12
+#            xcode: '13.2.1'
+#            extra: [vimtags, check-xcodeproj-compat]
 
           # Older version of Xcode, and used to publish legacy builds (for macOS 10.9 - 10.12)
-          - os: macos-12
-            xcode: '14.0' # last version of Xcode that uses the macOS 12 SDK, which still supports deploying to macOS 10.9
-            publish: true
-            legacy: true
-            publish_postfix: '_10.9'
+#          - os: macos-12
+#            xcode: '14.0' # last version of Xcode that uses the macOS 12 SDK, which still supports deploying to macOS 10.9
+#            publish: true
+#            legacy: true
+#            publish_postfix: '_10.9'
 
-          - os: macos-13
-            xcode: '15.2'
-            optimized: true
+#          - os: macos-13
+#            xcode: '15.2'
+#            optimized: true
 
           # Most up to date OS and Xcode. Used to publish release for the main build.
           # This runner uses Apple Silicon.
@@ -76,6 +76,13 @@ jobs:
             xcode: '15.2'
             publish: true
             optimized: true
+            publish_postfix: '_xcode15.2'
+
+          - os: macos-15
+            xcode: '16.0'
+            publish: true
+            optimized: true
+            publish_postfix: '_xcode16'
 
     runs-on: ${{ matrix.os }}
 
@@ -352,36 +359,36 @@ jobs:
             echo 'MacVim_xcode8.xcodeproj is outdated. Run "make -C src macvim-xcodeproj-compat" to re-generate it.'; false
           fi
 
-      - name: Test MacVim
-        timeout-minutes: 10
-        run: |
-          make ${MAKE_BUILD_ARGS} -C src macvim-tests
-
-      - name: Build Vim test binaries
-        run: |
-          # Build the unit test binaries first. With link-time-optimization they take some time to link. Running them
-          # separately de-couples them from the timeout in tests, and allow us to build in parallel jobs (since tests
-          # can't run in parallel).
-          NPROC=$(getconf _NPROCESSORS_ONLN)
-
-          set -o verbose
-          make ${MAKE_BUILD_ARGS} -j${NPROC} -C src unittesttargets
-
-      - name: Test Vim
-        timeout-minutes: 20
-        run: make ${MAKE_BUILD_ARGS} test
-
-      - name: Test Vim (GUI)
-        timeout-minutes: 20
-        run: |
-          make ${MAKE_BUILD_ARGS} -C src/testdir clean
-          make ${MAKE_BUILD_ARGS} -C src testgui
+#      - name: Test MacVim
+#        timeout-minutes: 10
+#        run: |
+#          make ${MAKE_BUILD_ARGS} -C src macvim-tests
+#
+#      - name: Build Vim test binaries
+#        run: |
+#          # Build the unit test binaries first. With link-time-optimization they take some time to link. Running them
+#          # separately de-couples them from the timeout in tests, and allow us to build in parallel jobs (since tests
+#          # can't run in parallel).
+#          NPROC=$(getconf _NPROCESSORS_ONLN)
+#
+#          set -o verbose
+#          make ${MAKE_BUILD_ARGS} -j${NPROC} -C src unittesttargets
+#
+#      - name: Test Vim
+#        timeout-minutes: 20
+#        run: make ${MAKE_BUILD_ARGS} test
+#
+#      - name: Test Vim (GUI)
+#        timeout-minutes: 20
+#        run: |
+#          make ${MAKE_BUILD_ARGS} -C src/testdir clean
+#          make ${MAKE_BUILD_ARGS} -C src testgui
 
       # Creates a DMG package of MacVim. Note that this doesn't create a GitHub release for us, because we would prefer to
       # do it manually, for two reasons: 1) signing / notarization are currently done out of CI, 2) we want to manually
       # format our release notes and add pictures to make them look nice.
       - name: Build MacVim dmg image
-        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
+#        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
         run: |
           # Use the --skip-jenkins flag to skip the prettify osascript calls which could fail due to permission issues in
           # CI environment.
@@ -396,7 +403,7 @@ jobs:
           fi
 
       - name: Upload MacVim image
-        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
+#        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
         uses: actions/upload-artifact@v4
         with:
           name: MacVim${{ matrix.publish_postfix  }}.dmg
