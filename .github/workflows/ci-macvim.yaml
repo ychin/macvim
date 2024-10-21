@@ -106,6 +106,12 @@ jobs:
           xcode-select -p
           xcodebuild -version
 
+      - name: Set up build environment
+        run: |
+          # Set up a reproducible build date/time. This is supported in Clang
+          # but Vim has custom support in the configure script as well.
+          echo "SOURCE_DATE_EPOCH=$(date -u +%s)" >> $GITHUB_ENV
+
       # Set up, install, and cache gettext library for localization.
       #
       - name: Set up gettext
@@ -242,6 +248,7 @@ jobs:
 
       - name: Show configure output
         run: |
+          echo "SOURCE_DATE_EPOCH: ${SOURCE_DATE_EPOCH}"
           cat src/auto/config.mk
           cat src/auto/config.h
 
