@@ -189,6 +189,11 @@ jobs:
 
       # All set up steps are done. Build and test MacVim below.
 
+      - name: Test Libs
+        run: |
+          shasum /opt/homebrew/lib/libintl.a
+          shasum /opt/homebrew/lib/libsodium.a
+
       - name: Configure
         run: |
           set -o verbose
@@ -237,11 +242,13 @@ jobs:
             sed -i.bak -f ci/config.mk.optimized.sed src/auto/config.mk
           fi
 
-      - name: Modify configure result
+          # Ruby is keg-only in Homebrew, so need to manually link in the path so Vim will know where to look for the binaries.
+          # TODO ychin this comment is not accurate. Currently it's just not finding the correct path.
+          perl -p -i -e "s#(?<=-DDYNAMIC_RUBY_DLL=\\\\\").*?(?=\\\\\")#${vi_cv_dll_name_ruby}#" src/auto/config.mk
+
+      - name: Verify configure result
         if: matrix.publish
         run: |
-          # Ruby is keg-only in Homebrew, so need to manually link in the path so Vim will know where to look for the binaries.
-          perl -p -i -e "s#(?<=-DDYNAMIC_RUBY_DLL=\\\\\").*?(?=\\\\\")#${vi_cv_dll_name_ruby}#" src/auto/config.mk
           grep -q -- "-DDYNAMIC_PERL_DLL=\\\\\"${vi_cv_dll_name_perl}\\\\\"" src/auto/config.mk
           grep -q -- "-DDYNAMIC_PYTHON_DLL=\\\\\"${vi_cv_dll_name_python}\\\\\"" src/auto/config.mk
           grep -q -- "-DDYNAMIC_PYTHON3_DLL=\\\\\"${vi_cv_dll_name_python3}\\\\\"" src/auto/config.mk
