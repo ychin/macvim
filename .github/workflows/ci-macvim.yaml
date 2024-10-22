@@ -241,6 +241,10 @@ jobs:
             # Additional optimizations like link-time optimizations that are a bit slower to build.
             sed -i.bak -f ci/config.mk.optimized.sed src/auto/config.mk
           fi
+          if ${{ matrix.publish == true }}; then
+            # TODO ychin comment on reproducible flags
+            sed -i.bak -f ci/config.mk.reproducible.sed src/auto/config.mk
+          fi
 
           # Ruby is keg-only in Homebrew, so need to manually link in the path so Vim will know where to look for the binaries.
           # TODO ychin this comment is not accurate. Currently it's just not finding the correct path.
