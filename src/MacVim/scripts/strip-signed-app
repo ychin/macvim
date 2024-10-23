@@ -1,0 +1,68 @@
+#!/bin/zsh
+
+# Copies a signed app bundle to a new temp location and strip all code
+# signatures. This is useful for validating reproducible builds as code
+# signatures are inherently non-deterministic.
+#
+# Note that the stripping of code signatures loses some of the information,
+# including whether the app is using hardened runtime and the entitlements
+# data. This script extracts the entitlements metadata into a separate folder
+# as a compromise, but does not extract other metadata such as hardened runtime
+# info.
+#
+# This approach is more deterministic than re-signing a signed app with adhoc
+# signature and --preserve-metadata because codesign will generate different
+# results depending on whether you are resigning or signing from scratch.
+
+set -e
+
+if [[ $# == 0 || $# == 1 ]]; then
+    echo "Usage: strip-signed-app <app_path> <tmp_folder_name>"
+    echo ""
+    echo "Copy app bundle to new temporary folder. Extract the signed entitlements and strip all code signature in the copied app bundle. Does not modify the original app."
+    echo ""
+    echo "Example: strip-signed-app ~/Downloads/MacVim.app tmp_output"
+    exit -1
+fi
+
+app_path=$1
+out_folder=$2
+
+if [[ -d "$out_folder" ]]; then
+    echo "'$out_folder' already exists. Remove it first as this script will create it."
+    exit 1
+fi
+
+mkdir "$out_folder"
+out_folder_full=$(realpath "$out_folder")
+
+cp -R "$app_path" "$out_folder"
+copied_app_path=$(realpath "$out_folder"/${app_path:t})
+
+cd "$out_folder"
+mkdir entitlements
+
+cd "$copied_app_path"
+
+echo "Copied to '$copied_app_path':"
+
+# Verify all code signatures first. This is not necessary but helps catch weird/
+# malicious/broken signature data before we strip them away.
+for f in **/*(*); do
+    if (codesign -d "$f" 2> /dev/null); then
+        codesign --verify $f
+    fi
+done
+
+# Now go through each binary and strip their signatures, while copying out
+# their entitlements (path slashes are normalized to colons).
+for f in **/*(*); do
+    if (codesign -d "$f" 2> /dev/null); then
+        codesign -d --entitlements ../entitlements/"${f:gs|/|:|}".xml --xml $f 2> /dev/null
+        (set -x; codesign --remove-signature $f)
+    fi
+done
+
+echo ""
+echo "Entitlements in '$out_folder_full/entitlements':"
+ls -1 "$out_folder_full"/entitlements
