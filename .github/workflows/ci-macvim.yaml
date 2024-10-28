@@ -297,7 +297,7 @@ jobs:
 
           popd
 
-          tar cvf build_info${{ matrix.publish_postfix }}.tar.gz build_info${{ matrix.publish_postfix }}
+          #tar cvf build_info${{ matrix.publish_postfix }}.tar.gz build_info${{ matrix.publish_postfix }}
 
       - name: Build
         env:
@@ -424,6 +424,11 @@ jobs:
 #          make ${MAKE_BUILD_ARGS} -C src/testdir clean
 #          make ${MAKE_BUILD_ARGS} -C src testgui
 
+      - name: Extract Vim dSYM files
+        run: |
+          (cd src; dsymutil Vim)
+          mv src/Vim.dSYM build_info${{ matrix.publish_postfix }}/
+
       # Creates a DMG package of MacVim. Note that this doesn't create a GitHub release for us, because we would prefer to
       # do it manually, for two reasons: 1) signing / notarization are currently done out of CI, 2) we want to manually
       # format our release notes and add pictures to make them look nice.
@@ -446,8 +451,8 @@ jobs:
 #        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
         uses: actions/upload-artifact@v4
         with:
-          name: build_info${{ matrix.publish_postfix }}.tar.gz
-          path: build_info${{ matrix.publish_postfix }}.tar.gz
+          name: build_info${{ matrix.publish_postfix }}
+          path: build_info${{ matrix.publish_postfix }}
 
       - name: Upload MacVim image
 #        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
