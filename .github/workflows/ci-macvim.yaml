@@ -270,6 +270,35 @@ jobs:
           cat src/auto/config.mk
           cat src/auto/config.h
 
+      - name: Aggregate build info
+        run: |
+          mkdir build_info${{ matrix.publish_postfix }}
+          pushd build_info${{ matrix.publish_postfix }}
+
+          # TODO see if I want to put it elsewhere
+          echo "{" > build_env.json
+          echo "\"SOURCE_DATE_EPOCH\": ${SOURCE_DATE_EPOCH}," >> build_env.json
+          echo "\"MACOSX_DEPLOYMENT_TARGET\": \"$MACOSX_DEPLOYMENT_TARGET\"," >> build_env.json
+          echo "\"git_commit\": \"$(git rev-parse HEAD)\"," >> build_env.json
+          echo "\"macos\": \"$(sw_vers --productVersion)\"," >> build_env.json
+          echo "\"xcode\": \"$(xcodebuild -version | head -2 | tail -1 | sed -e 's/Build version //')\"," >> build_env.json
+          echo "\"gettext\": $(brew info --json gettext | jq '.[0].versions.stable')," >> build_env.json
+          echo "\"libsodium\": $(brew info --json libsodium | jq '.[0].versions.stable')," >> build_env.json
+          echo "\"python2\": \"2.7\"," >> build_env.json
+          echo "\"python3\": $(brew info --json python3 | jq '.[0].versions.stable')," >> build_env.json
+          echo "\"ruby\": $(brew info --json ruby | jq '.[0].versions.stable')," >> build_env.json
+          echo "\"lua\": $(brew info --json lua | jq '.[0].versions.stable')," >> build_env.json
+          echo "\"perl\": \"$VERSIONER_PERL_VERSION\"" >> build_env.json
+          echo "}" >> build_env.json
+
+          echo "Build environment:"
+          # Use json.tool to prettify the output and to validate the JSON file is valid
+          python3 -m json.tool build_env.json
+
+          popd
+
+          tar cvf build_info${{ matrix.publish_postfix }}.tar.gz build_info${{ matrix.publish_postfix }}
+
       - name: Build
         env:
           LC_ALL: C
@@ -412,6 +441,13 @@ jobs:
           if ${{ matrix.publish_postfix != '' }}; then
             mv src/MacVim/build/Release/MacVim.dmg src/MacVim/build/Release/MacVim${{ matrix.publish_postfix }}.dmg
           fi
+
+      - name: Upload build info
+#        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_info${{ matrix.publish_postfix }}.tar.gz
+          path: build_info${{ matrix.publish_postfix }}.tar.gz
 
       - name: Upload MacVim image
 #        if: startsWith(github.ref, 'refs/tags/') && matrix.publish
