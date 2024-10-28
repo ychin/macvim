@@ -4282,6 +4282,8 @@ utf_find_illegal(void)
     vimconv_T	vimconv;
     char_u	*tofree = NULL;
 
+    int * test = 0;
+    *test = 123;
     vimconv.vc_type = CONV_NONE;
     if (enc_utf8 && (enc_canon_props(curbuf->b_p_fenc) & ENC_8BIT))
     {
