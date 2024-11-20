@@ -435,13 +435,7 @@ NSComparisonResult SortTabsForZOrder(MMTab *tab1, MMTab *tab2, void *draggedTab)
         NSRect frame = tab.frame;
         frame.size.width = i == _tabs.count - 1 ? t.width + t.remainder : t.width;
         frame.origin.x = i ? i * (t.width - TabOverlap) : 0;
-        if (shouldAnimate) {
-            [NSAnimationContext runAnimationGroup:^(NSAnimationContext * _Nonnull context) {
-                context.allowsImplicitAnimation = YES;
-                tab.animator.frame = frame;
-                [tab layout];
-            }];
-        } else tab.frame = frame;
+        tab.frame = frame;
     }
     // _tabsContainer expands to fit tabs, is at least as wide as _scrollView.
     NSRect frame = _tabsContainer.frame;
@@ -606,10 +600,14 @@ NSComparisonResult SortTabsForZOrder(MMTab *tab1, MMTab *tab2, void *draggedTab)
     // rapidly click them.
     static NSTimeInterval lastTime = 0;
     struct timespec t;
+    // TODO ychin this crashes on old Macs
+    /*
     clock_gettime(CLOCK_MONOTONIC, &t);
     NSTimeInterval currentTime = t.tv_sec + t.tv_nsec * 1.e-9;
     NSTimeInterval elapsedTime = currentTime - lastTime;
     lastTime = currentTime;
+     */
+    NSTimeInterval elapsedTime = 1.0;
 
     NSRect tabFrame = _tabs[index].frame;
     NSRect clipBounds = _scrollView.contentView.bounds;

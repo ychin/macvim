@@ -3,6 +3,8 @@
 #import "MMTabline.h"
 #import "MMHoverButton.h"
 
+#import "MacVim.h"
+
 @interface MMTab ()
 @property (nonatomic) NSColor *fillColor;
 @end
@@ -14,7 +16,7 @@
     NSTextField *_titleLabel;
 }
 
-+ (id)defaultAnimationForKey:(NSAnimatablePropertyKey)key
++ (id)defaultAnimationForKey:(NSString *)key
 {
     if ([key isEqualToString:@"fillColor"]) {
         CABasicAnimation *anim = [CABasicAnimation new];
@@ -148,7 +150,7 @@
     // line between the top of the tab and the window's title bar.
     // It looks better given the new way macOS 11 draws title bars.
     // Older macOS versions don't need this.
-    if (@available(macOS 11.0, *)) {
+    if (AVAILABLE_MAC_OS(11, 0)) {
         NSAffineTransform *transform = [NSAffineTransform new];
         [transform translateXBy:0 yBy:-1.0];
         [p transformUsingAffineTransform:transform];
