@@ -134,6 +134,20 @@ enum {
     options = opt;
 }
 
+- (void)updatePresentationOptions
+{
+    // Hide Dock and menu bar when going to full screen. Only do so if the current screen
+    // has a menu bar and dock.
+    if ([self screenHasDockAndMenu]) {
+        const bool showMenu = [[NSUserDefaults standardUserDefaults]
+                               boolForKey:MMNonNativeFullScreenShowMenuKey];
+
+        [NSApplication sharedApplication].presentationOptions = showMenu ?
+            NSApplicationPresentationAutoHideDock :
+            NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar;
+    }
+}
+
 - (void)enterFullScreen
 {
     ASLogDebug(@"Enter full-screen now");
@@ -147,16 +161,7 @@ enum {
     [winController setWindow:nil];
     [target setDelegate:nil];
 
-    // Hide Dock and menu bar when going to full screen. Only do so if the current screen
-    // has a menu bar and dock.
-    if ([self screenHasDockAndMenu]) {
-        const bool showMenu = [[NSUserDefaults standardUserDefaults]
-                               boolForKey:MMNonNativeFullScreenShowMenuKey];
-
-        [NSApplication sharedApplication].presentationOptions = showMenu ?
-            NSApplicationPresentationAutoHideDock :
-            NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar;
-    }
+    [self updatePresentationOptions];
 
     // fade to black
     Boolean didBlend = NO;
@@ -514,14 +519,7 @@ enum {
 - (void)windowDidBecomeMain:(NSNotification *)notification
 {
     // Hide menu and dock when this window gets focus.
-    if ([self screenHasDockAndMenu]) {
-        const bool showMenu = [[NSUserDefaults standardUserDefaults]
-                               boolForKey:MMNonNativeFullScreenShowMenuKey];
-
-        [NSApplication sharedApplication].presentationOptions = showMenu ?
-            NSApplicationPresentationAutoHideDock :
-            NSApplicationPresentationAutoHideDock | NSApplicationPresentationAutoHideMenuBar;
-    }
+    [self updatePresentationOptions];
 }
 
 
@@ -530,9 +528,7 @@ enum {
     // Un-hide menu/dock when we lose focus. This makes sure if we have multiple
     // windows opened, when the non-fullscreen windows get focus they will have the
     // dock and menu showing (since presentationOptions is per-app, not per-window).
-    if ([self screenHasDockAndMenu]) {
-        [NSApplication sharedApplication].presentationOptions = NSApplicationPresentationDefault;
-    }
+    [NSApplication sharedApplication].presentationOptions = NSApplicationPresentationDefault;
 }
 
 - (void)windowDidMove:(NSNotification *)notification

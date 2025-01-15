@@ -290,6 +290,11 @@
     return vimView;
 }
 
+- (MMFullScreenWindow *)fullScreenWindow
+{
+    return fullScreenWindow;
+}
+
 - (NSString *)windowAutosaveKey
 {
     return windowAutosaveKey;
