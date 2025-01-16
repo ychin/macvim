@@ -145,6 +145,12 @@ jobs:
           # Temporary fix to fix microphone permission issues for macos-14 when playing sound.
           sqlite3 $HOME/Library/Application\ Support/com.apple.TCC/TCC.db "INSERT OR IGNORE INTO access VALUES ('kTCCServiceMicrophone','/usr/local/opt/runner/provisioner/provisioner',1,2,4,1,NULL,NULL,0,'UNUSED',NULL,0,1687786159,NULL,NULL,'UNUSED',1687786159);"
 
+      - name: Grant screenshot access for macos-14+
+        if: matrix.os != 'macos-13'
+        run: |
+          # Grant access for taking screenshots. This only works in macos-14+ as they changed the format for the TCC database
+          sudo sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db "INSERT OR IGNORE INTO access VALUES ('kTCCServiceScreenCapture','org.vim.MacVim',0,2,0,1,NULL,NULL,0,'UNUSED',NULL,0,1687786159,NULL,NULL,'UNUSED',1687786159);"
+
       - name: Install scripting runtimes
         if: matrix.publish
         run: |
