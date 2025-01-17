@@ -110,6 +110,10 @@ jobs:
           xcode-select -p
           xcodebuild -version
 
+      - name: Prepare screenshots folder
+        run: |
+          mkdir $HOME/screenshots
+
       # Set up, install, and cache gettext library for localization.
       #
       - name: Set up gettext
@@ -388,6 +392,10 @@ jobs:
         run: |
           make ${MAKE_BUILD_ARGS} -C src/testdir clean
           make ${MAKE_BUILD_ARGS} -C src testgui
+
+      - name: Upload screenshots
+        if: ${{ !cancelled() }}
+        uses: ./.github/actions/upload_screenshots
 
       # Creates a DMG package of MacVim. Note that this doesn't create a GitHub release for us, because we would prefer to
       # do it manually, for two reasons: 1) signing / notarization are currently done out of CI, 2) we want to manually
