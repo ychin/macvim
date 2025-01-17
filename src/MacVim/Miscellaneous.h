@@ -159,6 +159,10 @@ enum {
 - (NSInteger)tag;
 @end
 
+@interface NSObject (MMDebug)
+- (NSString *)ivarDescription;
+- (void)dumpIvars;
+@end
 
 
 // Create a view with a "show hidden files" button to be used as accessory for

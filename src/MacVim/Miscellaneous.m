@@ -260,7 +260,233 @@ NSString *MMScrollOneDirectionOnlyKey     = @"MMScrollOneDirectionOnly";
 
 @end // NSNumber (MMExtras)
 
+#import <objc/runtime.h>
+@implementation NSObject (MMDebug)
 
+static NSString* ivarToString(id obj, const char *ivarType, void* ivarAddress, id ivarObject)
+{
+    // Documentation: https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html
+    if (ivarType[0] == '^') {
+        // Pointer type
+        void *pointerDeref = *(void **)ivarObject;
+        void *ivarAddressDeref = *((void**)ivarAddress);
+        return [NSString stringWithFormat:@"*%@", ivarToString(obj, ivarType + 1, ivarAddressDeref, (id)(pointerDeref))];
+    }
+    else if (ivarType[0] == '{')
+    {
+        // Struct
+        // If we know this specific struct and have specialized string output utilities, use that.
+#define STRUCT_TO_STRING(NAME, METHOD) \
+        if (strncmp(ivarType+1, #NAME, strlen(#NAME)) == 0) { \
+            return METHOD(*(NAME*)ivarAddress); \
+        }
+        STRUCT_TO_STRING(CGSize, NSStringFromSize);
+        STRUCT_TO_STRING(CGPoint, NSStringFromPoint);
+        STRUCT_TO_STRING(CGRect, NSStringFromRect);
+        STRUCT_TO_STRING(NSRange, NSStringFromRange);
+#undef STRUCT_TO_STRING
+
+        // Commented out WIP code for generic cases where we don't really have a way to calculate the struct's alignment and size easily.
+        // In fact, the type encoding does not expose enough information to do this properly. An easy example would be to write a struct
+        // of bitfields using int vs char. The size/alignment of the structs would be different but the type encoding would be the same,
+        // showing something like {b1b2b4} which do not tell you if in the source it was using char or int's.
+#if 0
+        char *eq = strchr(ivarType, '=');
+        if (eq != NULL) {
+            NSString *structName = [[[NSString alloc] initWithBytes:ivarType+1 length:eq-ivarType-1 encoding:NSUTF8StringEncoding] autorelease];
+            NSMutableString *structDesc = [NSMutableString stringWithFormat:@"%@: {", structName];
+            char *dataStart = eq + 1;
+            char *data = dataStart;
+            size_t offset = 0;
+            NSString *fieldName = nil;
+            while (data != NULL && *data != '}') {
+                if (*data == '"') {
+                    data = strchr(data + 1, '"');
+                    if (data != NULL) {
+                        fieldName = [[[NSString alloc] initWithBytes:dataStart+1 length:data-dataStart-1 encoding:NSUTF8StringEncoding] autorelease];
+                        data += 1;
+                    } else {
+                        // This is a failure state.
+                        return [NSString stringWithFormat:@"%s", ivarType];
+                    }
+                }
+                void *obj = *(void**)(ivarAddress + offset);
+                size_t objOffset = 0;
+                NSString *fieldDesc = ivarToString(obj, data, ivarAddress+offset, (id)obj, &objOffset);
+                offset += objOffset;
+                if (fieldName != nil) {
+                    [structDesc appendFormat:@"%@=%@ ", fieldName, fieldDesc];
+                } else {
+                    [structDesc appendFormat:@"%@ ", fieldDesc];
+                }
+
+                if (*data == 'b') {
+                    // We could let recursion calculate this for us but for now it's simpler to just do it here.
+                    do {
+                        data++;
+                    } while (isdigit(*data));
+                } else {
+                    data += 1;
+                }
+            }
+            [structDesc appendString:@"}"];
+            return structDesc;
+        }
+#endif
+    }
+
+    // Default signed data types
+    if(ivarType[0] == 'c')
+    {
+        char character = (char)(intptr_t)ivarObject;
+        return [NSString stringWithFormat:@"'%c'", character];
+    }
+    else if(ivarType[0] == 'i' || ivarType[0] == 'l') // l is also 32 bit in the 64 bit runtime environment
+    {
+        int integer = (int)(intptr_t)ivarObject;
+        return [NSString stringWithFormat:@"%i", integer];
+    }
+    else if(ivarType[0] == 's')
+    {
+        short shortVal = (short)(intptr_t)ivarObject;
+        return [NSString stringWithFormat:@"%i", (int)shortVal];
+    }
+    else if(ivarType[0] == 'q')
+    {
+        long long longVal = (long long)(intptr_t)ivarObject;
+        return [NSString stringWithFormat:@"%lli", longVal];
+    }
+    // Default unsigned data types
+    else if(ivarType[0] == 'C')
+    {
+        unsigned char chracter = (unsigned char)(uintptr_t)ivarObject;
+        return [NSString stringWithFormat:@"'%c'", chracter];
+    }
+    else if(ivarType[0] == 'I' || ivarType[0] == 'L')
+    {
+        unsigned int integer = (unsigned int)(uintptr_t)ivarObject;
+        return [NSString stringWithFormat:@"%u", integer];
+    }
+    else if(ivarType[0] == 'S')
+    {
+        unsigned short shortVal = (unsigned short)(uintptr_t)ivarObject;
+        return [NSString stringWithFormat:@"%i", (int)shortVal];
+    }
+    else if(ivarType[0] == 'Q')
+    {
+        unsigned long long longVal = (unsigned long long)(uintptr_t)ivarObject;
+        return [NSString stringWithFormat:@"%llu", longVal];
+    }
+    // Floats'n'stuff
+    else if(ivarType[0] == 'f')
+    {
+        float floatVal;
+        memcpy(&floatVal, &ivarObject, sizeof(float));
+
+        return [NSString stringWithFormat:@"%f", floatVal];
+    }
+    else if(ivarType[0] == 'd')
+    {
+        double doubleVal;
+        memcpy(&doubleVal, &ivarObject, sizeof(double));
+
+        return [NSString stringWithFormat:@"%f", doubleVal];
+    }
+    else if (ivarType[0] == 'b')
+    {
+        // Bitfield
+        // There isn't a good way to handle this because we don't know the offset of this bit field. Just show the whole thing as a 32-bit int for now.
+        int integer = (int)(intptr_t)ivarObject;
+        return [NSString stringWithFormat:@"0x%x", integer];
+    }
+    // Boolean and pointer
+    else if(ivarType[0] == 'B')
+    {
+        BOOL booleanVal = (BOOL)ivarObject;
+        return [NSString stringWithFormat:@"%@", (booleanVal ? @"YES" : @"NO")];
+    }
+    else if(ivarType[0] == 'v')
+    {
+        void *pointer = (void *)ivarObject;
+        return [NSString stringWithFormat:@"%p", pointer];
+    }
+    else if(ivarType[0] == '*' || ivarType[0] == ':') // SEL is just a typecast for a cstring
+    {
+        char *cstring = (char *)ivarObject;
+        return [NSString stringWithFormat:@"\"%s\"", cstring];
+    }
+    else if(strncmp(ivarType, "@", 1) == 0)
+    {
+        return [NSString stringWithFormat:@"%@", ivarObject];
+    }
+    else if(ivarType[0] == '#')
+    {
+        // Class objects
+        return @"#";
+    }
+    // Not currently handling:
+    // - Arrays, e.g. [12^f]
+    // - Unions
+    // Partially works:
+    // - Structs
+    // - Bitfields
+
+    return [NSString stringWithFormat:@"%s", ivarType];
+}
+
+- (NSString *)ivarDescription
+{
+    // Modified from https://stackoverflow.com/questions/6376344/generic-objective-c-description-method-to-print-ivar-values
+    unsigned int count = 0;
+    Class cls = [self class];
+    NSMutableString *baseDescription = [NSMutableString stringWithFormat:@"<%@: %p>", NSStringFromClass([self class]), self];
+    NSMutableArray *descriptions = [NSMutableArray array];
+    [descriptions addObject:baseDescription];
+
+    while (cls != nil) {
+        [descriptions addObject:[NSString stringWithFormat:@"\n%@: {", NSStringFromClass(cls)]];
+        Ivar *vars = class_copyIvarList(cls, &count);
+        for (NSUInteger i=0; i<count; i++) {
+            Ivar ivar = vars[i];
+            const char *ivarName = ivar_getName(ivar);
+            const char *ivarType = ivar_getTypeEncoding(ivar);
+            ptrdiff_t ivarOffset = ivar_getOffset(ivar);
+            id ivarObject = object_getIvar(self, ivar);
+
+            void* ivarAddress = ((char*)self) + ivarOffset;
+
+            [descriptions addObject:[NSString stringWithFormat:@"\n   %s: ", ivarName]];
+            NSString *ivarDesc = ivarToString(self, ivarType, ivarAddress, ivarObject);
+            [descriptions addObject:ivarDesc];
+        }
+        free(vars);
+        [descriptions addObject:@"\n}"];
+
+        cls = class_getSuperclass(cls);
+    }
+    NSString *description = [descriptions componentsJoinedByString:@""];
+    return description;
+}
+
+- (void)dumpIvars
+{
+    NSString *ivarsDump = [self ivarDescription];
+    NSLog(@"%@", ivarsDump);
+    NSURL *dlDir = [NSFileManager.defaultManager URLForDirectory:NSDownloadsDirectory
+                                                          inDomain:NSUserDomainMask
+                                                 appropriateForURL:NSFileManager.defaultManager.homeDirectoryForCurrentUser
+                                                            create:NO
+                                                             error:nil];
+    if (dlDir != nil) {
+        int timestamp = (int)[[NSDate date] timeIntervalSince1970];
+        NSURL *newFile = [dlDir URLByAppendingPathComponent:[NSString stringWithFormat:@"macvim_ivarsDump_%d.txt", timestamp]];
+        if (![ivarsDump writeToURL:newFile atomically:NO encoding:NSUTF8StringEncoding error:nil]) {
+            NSLog(@"Failed to write contents to ivars dump");
+        }
+    }
+}
+
+@end
 
 
     NSView *
