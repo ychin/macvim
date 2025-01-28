@@ -44,6 +44,7 @@
 
 - (MMTabline *)tabline;
 - (IBAction)addNewTab:(id)sender;
+- (void)showTabline:(BOOL)on;
 - (void)updateTabsWithData:(NSData *)data;
 - (void)refreshTabProperties;
 

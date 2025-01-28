@@ -251,7 +251,19 @@ enum {
 
 - (IBAction)addNewTab:(id)sender
 {
+    // Callback from the "Create a new tab button". We override this so we can
+    // send a message to Vim first and let it handle it before replying back.
     [vimController sendMessage:AddNewTabMsgID data:nil];
+}
+
+- (void)showTabline:(BOOL)on
+{
+    [tabline setHidden:!on];
+    if (!on) {
+        // When the tab is not shown we don't get tab updates from Vim. We just
+        // close all of them as otherwise we will be holding onto stale states.
+        [tabline closeAllTabs];
+    }
 }
 
 /// Callback from Vim to update the tabline with new tab data
