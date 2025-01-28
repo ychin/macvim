@@ -13,9 +13,9 @@ const CGFloat MinimumTabWidth = 100;
 const CGFloat TabOverlap      = 6;
 const CGFloat ScrollOneTabAllowance = 0.25; // If we are showing 75+% of the tab, consider it to be fully shown when deciding whether to scroll to next tab.
 
-static MMHoverButton* MakeHoverButton(MMTabline *tabline, NSString *imageName, NSString *tooltip, SEL action, BOOL continuous) {
+static MMHoverButton* MakeHoverButton(MMTabline *tabline, MMHoverButtonImage imageType, NSString *tooltip, SEL action, BOOL continuous) {
     MMHoverButton *button = [MMHoverButton new];
-    button.image = [MMHoverButton imageNamed:imageName];
+    button.image = [MMHoverButton imageFromType:imageType];
     button.translatesAutoresizingMaskIntoConstraints = NO;
     button.target = tabline;
     button.action = action;
@@ -81,9 +81,9 @@ static BOOL isDarkMode(NSAppearance *appearance) {
         _scrollView.documentView = _tabsContainer;
         [self addSubview:_scrollView];
 
-        _addTabButton = MakeHoverButton(self, @"AddTabButton", @"New Tab (⌘T)", @selector(addTabAtEnd), NO);
-        _leftScrollButton = MakeHoverButton(self, @"ScrollLeftButton", @"Scroll Tabs", @selector(scrollLeftOneTab), YES);
-        _rightScrollButton = MakeHoverButton(self, @"ScrollRightButton", @"Scroll Tabs", @selector(scrollRightOneTab), YES);
+        _addTabButton = MakeHoverButton(self, MMHoverButtonImageAddTab, @"New Tab (⌘T)", @selector(addTabAtEnd), NO);
+        _leftScrollButton = MakeHoverButton(self, MMHoverButtonImageScrollLeft, @"Scroll Tabs", @selector(scrollLeftOneTab), YES);
+        _rightScrollButton = MakeHoverButton(self, MMHoverButtonImageScrollRight, @"Scroll Tabs", @selector(scrollRightOneTab), YES);
 
         [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[_leftScrollButton][_rightScrollButton]-5-[_scrollView]-5-[_addTabButton]" options:NSLayoutFormatAlignAllCenterY metrics:nil views:NSDictionaryOfVariableBindings(_scrollView, _leftScrollButton, _rightScrollButton, _addTabButton)]];
         [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[_scrollView]|" options:0 metrics:nil views:@{@"_scrollView":_scrollView}]];
@@ -98,13 +98,14 @@ static BOOL isDarkMode(NSAppearance *appearance) {
 
         // Monitor for scroll wheel events so we can scroll the tabline
         // horizontally without the user having to hold down SHIFT.
+        __weak NSScrollView *weakScrollView = _scrollView;
         _scrollWheelEventMonitor = [NSEvent addLocalMonitorForEventsMatchingMask:NSEventMaskScrollWheel handler:^NSEvent * _Nullable(NSEvent * _Nonnull event) {
-            NSPoint location = [_scrollView convertPoint:event.locationInWindow fromView:nil];
+            NSPoint location = [weakScrollView convertPoint:event.locationInWindow fromView:nil];
             // We want events:
             //   where the mouse is over the _scrollView
             //   and where the user is not modifying it with the SHIFT key
             //   and initiated by the scroll wheel and not the trackpad
-            if ([_scrollView mouse:location inRect:_scrollView.bounds]
+            if ([weakScrollView mouse:location inRect:weakScrollView.bounds]
                 && !event.modifierFlags
                 && !event.hasPreciseScrollingDeltas)
             {
