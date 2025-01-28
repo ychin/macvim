@@ -330,6 +330,12 @@ enum {
     }
 }
 
+- (void)refreshTabProperties
+{
+    NSUserDefaults *ud = [NSUserDefaults standardUserDefaults];
+    tabline.showsTabScrollButtons = [ud boolForKey:MMShowTabScrollButtonsKey];
+}
+
 - (void)createScrollbarWithIdentifier:(int32_t)ident type:(int)type
 {
     MMScroller *scroller = [[MMScroller alloc] initWithIdentifier:ident
