@@ -402,7 +402,7 @@ enum {
 
     if (showMenu) {
         // Offset by menu height
-        if (offset.top == 0) {
+        if (0) {//offset.top == 0) {
             const CGFloat menuBarHeight = [[[NSApplication sharedApplication] mainMenu] menuBarHeight];
             if (menuBarHeight > offset.top) {
                 offset.top = menuBarHeight;
@@ -414,7 +414,7 @@ enum {
             // to a one-pixel black line, so we need to manually increment it by one. Yes, it sucks.
             NSRect visibleFrame = [self screen].visibleFrame;
             visibleFrame.size.height += 1;
-            const CGFloat menuBarHeight = [self screen].frame.size.height - NSMaxY(visibleFrame);
+            const CGFloat menuBarHeight = [self screen].frame.size.height - visibleFrame.size.height;
             if (menuBarHeight > offset.top) {
                 offset.top = menuBarHeight;
             }
