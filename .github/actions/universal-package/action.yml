@@ -9,6 +9,8 @@ description: Create universal Homebrew package which contains x86_64 and arm64
 # We still use Homebrew to manage the library because their formulas are up to date and have correct build instructions
 # that will work. This way we don't have to manually configuring and building and updating the package info.
 
+# TODO ychin this does not work in legacy builds anymore because Homebrew complains about old Xcode version. Can manually make it not check, see:
+# https://stackoverflow.com/questions/40296756/homebrew-saying-xcode-is-outdated
 inputs:
   formula:
     description: Formura name
