@@ -120,6 +120,7 @@ jobs:
 
       # Cache Python 2 to avoid downloading the installer every time. Legacy self-hosted runner
       # already has this installed. This cache shouldn't change over time as Python 2.7 is legacy.
+      # Can't directly cache to /Library/Frameworks/Python.framework due to permission issues.
       - name: Cache Python 2
         if: inputs.publish && !inputs.legacy
         uses: actions/cache@v4
@@ -154,8 +155,8 @@ jobs:
           #
           # This will be removed in the future as Python2 has been completely
           # unsupported for years.
-          if [ -d /home/runner/python27-cache ]; then
-            cp -R /home/runner/python27-cache /Library/Frameworks/Python.framework/Versions/2.7
+          if [ -d python27-cache ]; then
+            sudo cp -R python27-cache /Library/Frameworks/Python.framework/Versions/2.7
           else
             curl https://www.python.org/ftp/python/2.7.18/python-2.7.18-macosx10.9.pkg -o ~/Downloads/python-2.7.18-macosx10.9.pkg
             sudo installer -pkg ~/Downloads/python-2.7.18-macosx10.9.pkg -target /
