@@ -118,13 +118,13 @@ jobs:
           # Temporary fix to fix microphone permission issues for macos-14 when playing sound.
           sqlite3 $HOME/Library/Application\ Support/com.apple.TCC/TCC.db "INSERT OR IGNORE INTO access VALUES ('kTCCServiceMicrophone','/usr/local/opt/runner/provisioner/provisioner',1,2,4,1,NULL,NULL,0,'UNUSED',NULL,0,1687786159,NULL,NULL,'UNUSED',1687786159);"
 
-      # Cache Python 2 to avoid having to download the installer every time. Legacy self-hosted
-      # runner already has this installed.
+      # Cache Python 2 to avoid downloading the installer every time. Legacy self-hosted runner
+      # already has this installed. This cache shouldn't change over time as Python 2.7 is legacy.
       - name: Cache Python 2
         if: inputs.publish && !inputs.legacy
         uses: actions/cache@v4
         with:
-          path: /Library/Frameworks/Python.framework/Versions/2.7
+          path: python27-cache
           key: ${{ inputs.os }}-python27
 
       - name: Install scripting runtimes
@@ -154,9 +154,12 @@ jobs:
           #
           # This will be removed in the future as Python2 has been completely
           # unsupported for years.
-          if ! [ -d /Library/Frameworks/Python.framework/Versions/2.7 ]; then
+          if [ -d /home/runner/python27-cache ]; then
+            cp -R /home/runner/python27-cache /Library/Frameworks/Python.framework/Versions/2.7
+          else
             curl https://www.python.org/ftp/python/2.7.18/python-2.7.18-macosx10.9.pkg -o ~/Downloads/python-2.7.18-macosx10.9.pkg
             sudo installer -pkg ~/Downloads/python-2.7.18-macosx10.9.pkg -target /
+            cp -R /Library/Frameworks/Python.framework/Versions/2.7 python27-cache
           fi
 
       # All set up steps are done. Build and test MacVim below.
@@ -174,7 +177,7 @@ jobs:
             --enable-gui=macvim
             --with-compiledby="GitHub Actions"
           )
-          if ${{ inputs.publish == true }}; then
+          if [[ "${{ inputs.publish }}" == "true" ]]; then
             CONFOPT+=(
               --enable-perlinterp=dynamic
               --enable-pythoninterp=dynamic
