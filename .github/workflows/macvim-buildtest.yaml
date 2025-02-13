@@ -118,6 +118,15 @@ jobs:
           # Temporary fix to fix microphone permission issues for macos-14 when playing sound.
           sqlite3 $HOME/Library/Application\ Support/com.apple.TCC/TCC.db "INSERT OR IGNORE INTO access VALUES ('kTCCServiceMicrophone','/usr/local/opt/runner/provisioner/provisioner',1,2,4,1,NULL,NULL,0,'UNUSED',NULL,0,1687786159,NULL,NULL,'UNUSED',1687786159);"
 
+      # Cache Python 2 to avoid having to download the installer every time. Legacy self-hosted
+      # runner already has this installed.
+      - name: Cache Python 2
+        if: inputs.publish && !inputs.legacy
+        uses: actions/cache@v4
+        with:
+          path: /Library/Frameworks/Python.framework/Versions/2.7
+          key: ${{ inputs.os }}-python27
+
       - name: Install scripting runtimes
         if: inputs.publish
         run: |
@@ -144,8 +153,10 @@ jobs:
           #
           # This will be removed in the future as Python2 has been completely
           # unsupported for years.
-          curl https://www.python.org/ftp/python/2.7.18/python-2.7.18-macosx10.9.pkg -o ~/Downloads/python-2.7.18-macosx10.9.pkg
-          sudo installer -pkg ~/Downloads/python-2.7.18-macosx10.9.pkg -target /
+          if ! [ -d /Library/Frameworks/Python.framework/Versions/2.7 ]; then
+            curl https://www.python.org/ftp/python/2.7.18/python-2.7.18-macosx10.9.pkg -o ~/Downloads/python-2.7.18-macosx10.9.pkg
+            sudo installer -pkg ~/Downloads/python-2.7.18-macosx10.9.pkg -target /
+          fi
 
       # All set up steps are done. Build and test MacVim below.
 
