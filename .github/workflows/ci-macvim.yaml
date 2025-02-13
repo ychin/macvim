@@ -31,11 +31,12 @@ jobs:
 #            legacy: true
 #            publish_postfix: '_10.9'
 
-          - os_release: [self-hosted, macos-13, xcode14]
-            #publish: true
-            legacy: true
-            #publish_postfix: '_10.9'
+          # Self-hosted runner with old enough software to be able to make legacy builds.
+          - os: [self-hosted, macos-13, xcode14]
             skip: ${{ !startswith(github.ref, 'refs/tags/') }}
+            legacy: true
+            publish: true
+            publish_postfix: '_10.9'
 
           - os: macos-13
             xcode: '15.2'
