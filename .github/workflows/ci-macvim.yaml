@@ -48,7 +48,6 @@ jobs:
           - os: macos-14
             xcode: '15.4'
             testgui: false
-            optimized: true
 
           # Most up to date OS and Xcode. Used to publish release for the main build.
           - os: macos-15
