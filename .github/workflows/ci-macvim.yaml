@@ -32,11 +32,12 @@ jobs:
 #            publish_postfix: '_10.9'
 
           # Self-hosted runner with old enough software to be able to make legacy builds.
-          - os: [self-hosted, macos-13, xcode14]
-            skip: ${{ !startswith(github.ref, 'refs/tags/') }}
-            legacy: true
+          # We only run this when making a release build.
+          - os: macos-13-xcode14-self-hosted
             publish: true
             publish_postfix: '_10.9'
+            skip: ${{ !startswith(github.ref, 'refs/tags/') }}
+            legacy: true
 
           - os: macos-13
             xcode: '15.2'
@@ -63,5 +64,6 @@ jobs:
       legacy: ${{ matrix.legacy }}
       xcode: ${{ matrix.xcode }}
       publish: ${{ matrix.publish }}
+      publish_postfix: ${{ matrix.publish_postfix }}
       optimized: ${{ matrix.optimized }}
       vimtags: ${{ contains(matrix.extra, 'vimtags') }}
