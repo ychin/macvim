@@ -1,5 +1,7 @@
 name: MacVim GitHub CI
 
+# Main CI workflow for MacVim. Will build and test MacVim on different platforms.
+
 on:
   push:
   pull_request:
@@ -18,21 +20,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-#          # Oldest version of Xcode supported on GitHub Action to test source code backwards compatibility
-#          # This version of Xcode can run on macOS 11 where as 13.3 has to run on macOS 12.
-#          - os: macos-12
-#            xcode: '13.2.1'
-#            extra: [vimtags, check-xcodeproj-compat]
-#
-#          # Older version of Xcode, and used to publish legacy builds (for macOS 10.9 - 10.12)
-#          - os: macos-12
-#            xcode: '14.0' # last version of Xcode that uses the macOS 12 SDK, which still supports deploying to macOS 10.9
-#            publish: true
-#            legacy: true
-#            publish_postfix: '_10.9'
-
-          # Self-hosted runner with old enough software to be able to make legacy builds.
-          # We only run this when making a release build.
+          # Self-hosted runner with old enough software (Xcode 14.0.1) to be
+          # able to make legacy builds.  We only run this when making a release
+          # build.
           - os: macos-13-xcode14-self-hosted
             publish: true
             publish_postfix: '_10.9'
@@ -66,3 +56,4 @@ jobs:
       publish_postfix: ${{ matrix.publish_postfix }}
       optimized: ${{ matrix.optimized }}
       vimtags: ${{ contains(matrix.extra, 'vimtags') }}
+      check-xcodeproj-compat: ${{ contains(matrix.extra, 'check-xcodeproj-compat') }}
