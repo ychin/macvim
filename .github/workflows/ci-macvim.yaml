@@ -29,10 +29,10 @@ jobs:
             #skip: ${{ ! startswith(github.ref, 'refs/tags/release') }}
             legacy: true
 
-#          - os: macos-13
-#            xcode: '15.2'
-#            testgui: true
-#            extra: [vimtags, check-xcodeproj-compat]
+          - os: macos-13
+            xcode: '15.2'
+            testgui: true
+            extra: [vimtags, check-xcodeproj-compat]
 
 #          # Below runners use Apple Silicon.
 #          - os: macos-14

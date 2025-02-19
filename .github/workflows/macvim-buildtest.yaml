@@ -333,7 +333,6 @@ jobs:
           git diff --exit-code -- runtime/doc/tags
 
       - name: Check Xcode project compatibility version
-        if: contains(matrix.extra, 'check-xcodeproj-compat')
         if: inputs['check-xcodeproj-compat']
         run: |
           # Confirm that the compatibility version of xcodeproj is correct and not outdated.
