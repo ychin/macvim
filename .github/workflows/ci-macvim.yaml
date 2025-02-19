@@ -50,7 +50,7 @@ jobs:
     with:
       skip: ${{ matrix.skip }}
       os: ${{ matrix.os }}
-      legacy: ${{ matrix.legacy }}
+      legacy: ${{ matrix.legacy && true || false }}
       xcode: ${{ matrix.xcode }}
       publish: ${{ matrix.publish }}
       publish_postfix: ${{ matrix.publish_postfix }}

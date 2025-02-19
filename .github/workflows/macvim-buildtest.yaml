@@ -10,7 +10,7 @@ on:
       os:
         type: string
       legacy:
-        type: string
+        type: boolean
       xcode:
         type: string
       publish:
