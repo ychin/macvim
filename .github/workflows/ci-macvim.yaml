@@ -26,7 +26,7 @@ jobs:
           - os: macos-13-xcode14-self-hosted
             publish: true
             publish_postfix: '_10.9'
-            #skip: ${{ ! startswith(github.ref, 'refs/tags/release') }}
+            skip: ${{ ! startswith(github.ref, 'refs/tags/release') }}
             legacy: true
 
           - os: macos-13
@@ -34,10 +34,10 @@ jobs:
             testgui: true
             extra: [vimtags, check-xcodeproj-compat]
 
-#          # Below runners use Apple Silicon.
-#          - os: macos-14
-#            xcode: '15.4'
-#            testgui: false
+          # Below runners use Apple Silicon.
+          - os: macos-14
+            xcode: '15.4'
+            testgui: false
 
           # Most up to date OS and Xcode. Used to publish release for the main build.
           - os: macos-15
@@ -48,12 +48,12 @@ jobs:
 
     uses: ./.github/workflows/macvim-buildtest.yaml
     with:
-      skip: ${{ matrix.skip }}
+      skip: ${{ matrix.skip && true || false }}
       os: ${{ matrix.os }}
       legacy: ${{ matrix.legacy && true || false }}
       xcode: ${{ matrix.xcode }}
-      publish: ${{ matrix.publish }}
+      publish: ${{ matrix.publish && true || false }}
       publish_postfix: ${{ matrix.publish_postfix }}
-      optimized: ${{ matrix.optimized }}
+      optimized: ${{ matrix.optimized && true || false }}
       vimtags: ${{ contains(matrix.extra, 'vimtags') }}
       check-xcodeproj-compat: ${{ contains(matrix.extra, 'check-xcodeproj-compat') }}

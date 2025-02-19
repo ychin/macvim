@@ -6,7 +6,7 @@ on:
   workflow_call:
     inputs:
       skip:
-        type: string
+        type: boolean
       os:
         type: string
       legacy:
@@ -14,15 +14,15 @@ on:
       xcode:
         type: string
       publish:
-        type: string
+        type: boolean
       publish_postfix:
         type: string
       optimized:
-        type: string
+        type: boolean
       vimtags:
-        type: string
+        type: boolean
       check-xcodeproj-compat:
-        type: string
+        type: boolean
 
 env:
   MACOSX_DEPLOYMENT_TARGET: '10.13'
