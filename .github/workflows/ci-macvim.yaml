@@ -21,12 +21,12 @@ jobs:
       matrix:
         include:
           # Self-hosted runner with old enough software (Xcode 14.0.1) to be
-          # able to make legacy builds.  We only run this when making a release
-          # build.
+          # able to make legacy builds. We only run this when making a full
+          # release build.
           - os: macos-13-xcode14-self-hosted
             publish: true
             publish_postfix: '_10.9'
-            skip: ${{ !startswith(github.ref, 'refs/tags/') }}
+            skip: ${{ ! startswith(github.ref, 'refs/tags/release') }}
             legacy: true
 
           - os: macos-13

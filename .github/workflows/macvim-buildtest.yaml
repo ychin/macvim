@@ -1,8 +1,9 @@
 name: MacVim Build and Test
 
+# Child workflow to be called by other workflows for building/testing MacVim
+
 on:
   workflow_call:
-    # TODO ychin turn these into boolean
     inputs:
       skip:
         type: string
@@ -28,8 +29,7 @@ env:
   MACOSX_DEPLOYMENT_TARGET_LEGACY: '10.9'
 
   MACVIM_ARCHS: "x86_64 arm64"  # Universal app for Intel/Apple Silicon
-  # TODO ychin switch to universal? Makes testing easier.
-  MACVIM_ARCHS_LEGACY: "x86_64" # Legacy builds only need to build x86-64 because Apple Silicon can't run on these old OSes
+  MACVIM_ARCHS_LEGACY: "x86_64 arm64" # Build universal for legacy too, mostly just to make building/testing on Apple Silicon CI work. In reality all Apple Silicon Macs shoud use non-legacy.
 
   CC: clang
 
@@ -116,9 +116,11 @@ jobs:
           # Apple diff is broken. Use GNU diff instead. See http://github.com/vim/vim/issues/14056.
           brew install --quiet diffutils
 
-      # Cache Python 2 to avoid downloading the installer every time. Legacy self-hosted runner
-      # already has this installed. This cache shouldn't change over time as Python 2.7 is legacy.
-      # Can't directly cache to /Library/Frameworks/Python.framework due to permission issues.
+      # Cache Python 2 to avoid downloading the installer every time. This cache shouldn't change
+      # over time as Python 2.7 is legacy.  Can't directly cache to
+      # /Library/Frameworks/Python.framework due to permission issues.
+      #
+      # Note: Legacy self-hosted runner already has this installed and doesn't need this.
       - name: Cache Python 2
         if: inputs.publish && !inputs.legacy
         uses: actions/cache@v4
@@ -164,7 +166,7 @@ jobs:
           else
             curl https://www.python.org/ftp/python/2.7.18/python-2.7.18-macosx10.9.pkg -o ~/Downloads/python-2.7.18-macosx10.9.pkg
             sudo installer -pkg ~/Downloads/python-2.7.18-macosx10.9.pkg -target /
-            cp -R /Library/Frameworks/Python.framework/Versions/2.7 python27-cache
+            cp -R /Library/Frameworks/Python.framework/Versions/2.7 python27-cache # Allow this to be cached
           fi
 
       # All set up steps are done. Build and test MacVim below.
