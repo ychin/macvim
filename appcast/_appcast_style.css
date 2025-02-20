@@ -4,16 +4,16 @@ div > h1 { padding-bottom: .3em; border-bottom: 1px solid gray; }
 
 div > details > summary  {
   font-size: 1.2em;
-  background-color: #599A42;
+  /*background-color: #599A42;*/
   border-radius: 5px;
-  /*border-bottom: 3px solid #57c4d0;*/
+  border-bottom: 3px solid #57c4d0;
   /*background-color: #57c4d0;*/
   cursor: pointer;
   padding: 10px;
 }
 @media (prefers-color-scheme: dark) {
   div > details > summary {
-    background-color: rgb(48,209,88);
+    /*background-color: rgb(48,209,88);*/
   }
 }
 div.sparkle-installed-version { display:none; }

@@ -12,8 +12,11 @@
 </details>
 </div>
 <div data-sparkle-version=178>
-<header><h1>r178</h1></header>
+<details>
+<summary>r178</summary>
+<!-- <header><h1>r178</h1></header> -->
 {% include releases/r178.html %}
+</details>
 </div>
 <p><br /><small><a href="https://github.com/macvim-dev/macvim/releases/latest">Latest release notes &gt;</a></small></p>
       ]]></description>
