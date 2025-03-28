@@ -1,7 +1,7 @@
 " Test for python 2 commands.
 
 source check.vim
-CheckFeature python
+CheckFeature python_compiled
 CheckFeature quickfix
 source shared.vim
 

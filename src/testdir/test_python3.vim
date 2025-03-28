@@ -1,7 +1,7 @@
 " Test for python 3 commands.
 
 source check.vim
-CheckFeature python3
+CheckFeature python3_compiled
 source shared.vim
 
 func Create_vim_list()
