@@ -498,7 +498,7 @@
 		|| defined(FEAT_GUI_MSWIN) \
 		|| (defined(FEAT_GUI_MOTIF) && defined(HAVE_XPM)) \
 		|| defined(FEAT_GUI_PHOTON) \
-                || defined(FEAT_GUI_MACVIM) \
+		|| defined(FEAT_GUI_MACVIM) \
 		|| defined(FEAT_GUI_HAIKU))
 
 # define FEAT_TOOLBAR
@@ -944,7 +944,7 @@
  * +dnd		Drag'n'drop support.  Always used for the GTK+ GUI and MacVim.
  */
 #if defined(FEAT_CLIPBOARD) && (defined(FEAT_GUI_GTK) \
-        || defined(FEAT_GUI_MACVIM))
+	|| defined(FEAT_GUI_MACVIM))
 # define FEAT_DND
 #endif
 

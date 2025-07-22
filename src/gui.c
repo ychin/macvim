@@ -1429,7 +1429,7 @@ gui_update_cursor(
 gui_position_menu(void)
 {
 # if !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MOTIF) \
-        || defined(FEAT_GUI_MACVIM))
+	|| defined(FEAT_GUI_MACVIM))
     if (gui.menu_is_active && gui.in_use)
 	gui_mch_set_menu_pos(0, 0, gui.menu_width, gui.menu_height);
 # endif
@@ -1457,7 +1457,7 @@ gui_position_components(int total_width UNUSED)
 
     text_area_y = 0;
 #if defined(FEAT_MENU) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_PHOTON) \
-        || defined(FEAT_GUI_MACVIM))
+	|| defined(FEAT_GUI_MACVIM))
     gui.menu_width = total_width;
     if (gui.menu_is_active)
 	text_area_y += gui.menu_height;
@@ -4367,7 +4367,7 @@ gui_update_scrollbars(
 	    h = (sb->height + sb->status_height) * gui.char_height;
 	    y = sb->top * gui.char_height + gui.border_offset;
 #if defined(FEAT_MENU) && !(defined(FEAT_GUI_GTK) || defined(FEAT_GUI_MOTIF) \
-        || defined(FEAT_GUI_PHOTON) || defined(FEAT_GUI_MACVIM))
+	|| defined(FEAT_GUI_PHOTON) || defined(FEAT_GUI_MACVIM))
 	    if (gui.menu_is_active)
 		y += gui.menu_height;
 #endif

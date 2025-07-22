@@ -5129,7 +5129,7 @@ check_fuoptions(void)
 	    else
 	    {
 		char_u hg_term; // character terminating highlight group string
-                                // in 'background' option
+				// in 'background' option
 
 		// highlight group name
 		for (j = i; ASCII_ISALPHA(p[j]); ++j)

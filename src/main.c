@@ -813,9 +813,9 @@ vim_main2(void)
     // whereas this may be VIM2, which looks weird.
     if (params.servername != NULL && gui.in_use)
     {
-        serverRegisterName(params.servername);
-        vim_free(params.servername);
-        params.servername = NULL;
+	serverRegisterName(params.servername);
+	vim_free(params.servername);
+	params.servername = NULL;
     }
 # endif
 #endif
@@ -1386,9 +1386,9 @@ main_loop(
     while (!cmdwin || cmdwin_result == 0)
     {
 #ifdef FEAT_GUI_MACVIM
-        // Cocoa needs an NSAutoreleasePool in place or it will leak memory.
-        // This particular pool gets released once every loop.
-        void *autoreleasePool = gui_macvim_new_autoreleasepool();
+	// Cocoa needs an NSAutoreleasePool in place or it will leak memory.
+	// This particular pool gets released once every loop.
+	void *autoreleasePool = gui_macvim_new_autoreleasepool();
 #endif
 
 	if (stuff_empty())
@@ -1704,9 +1704,9 @@ main_loop(
 	}
 
 #ifdef FEAT_GUI_MACVIM
-        // TODO! Make sure there are no continue statements that will cause
-        // this not to be called or MacVim will leak memory!
-        gui_macvim_release_autoreleasepool(autoreleasePool);
+	// TODO! Make sure there are no continue statements that will cause
+	// this not to be called or MacVim will leak memory!
+	gui_macvim_release_autoreleasepool(autoreleasePool);
 #endif
     }
 
