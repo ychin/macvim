@@ -1,4 +1,4 @@
-Testing push test 1
+Testing push test squash
 <h1 align=center>
 <img src=https://macvim.org/docs/MacVim.png alt="MacVim logo" style="height:4em"><br>
 MacVim
