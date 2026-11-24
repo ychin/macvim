@@ -5104,8 +5104,10 @@ parse_csi(
 	    if (gui.in_use)
 	    {
 #ifdef FEAT_GUI_MACVIM
-		x += wp->w_wincol * cell_width;
-		y += W_WINROW(wp) * cell_height;
+		struct cellsize cs;
+		gui_mch_calc_cell_size(&cs);
+		x += wp->w_wincol * cs.cs_xpixel;
+		y += W_WINROW(wp) * cs.cs_ypixel;
 #else
 		x += wp->w_wincol * gui.char_width;
 		y += W_WINROW(wp) * gui.char_height;
